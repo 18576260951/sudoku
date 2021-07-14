@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/aop
+        http://www.springframework.org/schema/aop/spring-aop.xsd
+        http://www.springframework.org/schema/tx
+        http://www.springframework.org/schema/tx/spring-tx.xsd
+        http://www.springframework.org/schema/mvc
+        http://www.springframework.org/schema/mvc/spring-mvc.xsd">
+
+    <context:component-scan base-package="com.sunner"/>
+    <context:property-placeholder location="classpath:config.properties" file-encoding="utf-8"/>
+    <!--spring开启"SpringMVC注解"支持,   conversion-service:类型转换器注册对象,此时@DateTimeFormat注解也会支持自定义的类型转换器conversionService111-->
+    <mvc:annotation-driven/>
+
+    <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+        <property name="driverClassName" value="${mysql.driver}"/>
+        <property name="url" value="${mysql.url}"/>
+        <property name="username" value="${mysql.username}"/>
+        <property name="password" value="${mysql.password}"/>
+    </bean>
+
+    <!--放行访问-->
+    <mvc:resources mapping="/WEB-INF/pages/**" location="/WEB-INF/pages/"/>
+
+    <bean class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource"/>
+        <!--<property name="typeAliasesPackage" value="com.sunner.pojo"/>--><!--给某一包下的所有JavaBean起别名(类名就是别名)-->
+        <property name="configLocation" value="classpath:mybatisMain.xml"/><!--读取mybatis的主配置文件-->
+        <property name="mapperLocations" value="classpath:com/sunner/function/dao/SudokuDao.xml"/><!--读取映射配置文件-->
+    </bean>
+    <!--配置Dao层接口包扫描(并将生成的Dao代理对象交给Spring容器管理)-->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="com.sunner.function.dao"/>
+    </bean>
+
+    <!--事务管理-->
+    <bean id="txManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"/>   <!--注入数据源-->
+    </bean>
+    <tx:annotation-driven transaction-manager="txManager"/>
+
+    <aop:aspectj-autoproxy/>
+
+
+</beans>
