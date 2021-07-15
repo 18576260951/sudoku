@@ -17,6 +17,7 @@ import java.util.*;
 @Service
 @SuppressWarnings("all")
 public class SudokuServiceImpl implements SudokuService {
+    //git测试
 
     public Map<String,String> sudokuMap;//将玩家输入的数独值放入一个Map中
     public Map<String,Set<String>> possibleMap;//得到数独空白处可能值
